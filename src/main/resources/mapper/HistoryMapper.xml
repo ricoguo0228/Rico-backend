@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rico.rbi.mapper.HistoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.rico.rbi.model.entity.History">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="askContent" column="askContent" jdbcType="VARCHAR"/>
+            <result property="replyContent" column="replyContent" jdbcType="VARCHAR"/>
+            <result property="userId" column="userId" jdbcType="BIGINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,askContent,replyContent,
+        userId,createTime
+    </sql>
+</mapper>
