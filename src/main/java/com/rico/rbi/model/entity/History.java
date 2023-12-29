@@ -41,6 +41,16 @@ public class History implements Serializable {
      */
     private Date createTime;
 
+    /**
+     * 
+     */
+    private Integer modelId;
+
+    /**
+     * 
+     */
+    private Integer isDelete;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

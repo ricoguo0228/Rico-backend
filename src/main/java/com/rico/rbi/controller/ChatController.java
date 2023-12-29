@@ -18,7 +18,8 @@ import com.rico.rbi.manager.AiManager;
 import com.rico.rbi.manager.RedisLimiterManager;
 import com.rico.rbi.model.dto.chart.*;
 import com.rico.rbi.model.dto.chat.ChatAddRequest;
-import com.rico.rbi.model.entity.Chart;
+import com.rico.rbi.model.dto.chat.ChatQueryRequest;
+import com.rico.rbi.model.entity.History;
 import com.rico.rbi.model.entity.History;
 import com.rico.rbi.model.entity.User;
 import com.rico.rbi.model.vo.BiResponse;
@@ -49,9 +50,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 @RequestMapping("/chat")
 @Slf4j
 public class ChatController {
-
-    @Resource
-    private ChartService chartService;
 
     @Resource
     private HistoryService historyService;
@@ -107,13 +105,13 @@ public class ChatController {
         User user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
         // 判断是否存在
-        Chart oldChart = chartService.getById(id);
-        ThrowUtils.throwIf(oldChart == null, ErrorCode.NOT_FOUND_ERROR);
+        History oldHistory = historyService.getById(id);
+        ThrowUtils.throwIf(oldHistory == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可删除
-        if (!oldChart.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
+        if (!oldHistory.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
-        boolean b = chartService.removeById(id);
+        boolean b = historyService.removeById(id);
         return ResultUtils.success(b);
     }
 
@@ -129,13 +127,13 @@ public class ChatController {
         if (chartUpdateRequest == null || chartUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Chart chart = new Chart();
+        History chart = new History();
         BeanUtils.copyProperties(chartUpdateRequest, chart);
         long id = chartUpdateRequest.getId();
         // 判断是否存在
-        Chart oldChart = chartService.getById(id);
-        ThrowUtils.throwIf(oldChart == null, ErrorCode.NOT_FOUND_ERROR);
-        boolean result = chartService.updateById(chart);
+        History oldHistory = historyService.getById(id);
+        ThrowUtils.throwIf(oldHistory == null, ErrorCode.NOT_FOUND_ERROR);
+        boolean result = historyService.updateById(chart);
         return ResultUtils.success(result);
     }
 
@@ -146,57 +144,57 @@ public class ChatController {
      * @return
      */
     @GetMapping("/get")
-    public BaseResponse<Chart> getChartById(long id, HttpServletRequest request) {
+    public BaseResponse<History> getChartById(long id) {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Chart chart = chartService.getById(id);
-        if (chart == null) {
+        History history = historyService.getById(id);
+        if (history == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        return ResultUtils.success(chart);
+        return ResultUtils.success(history);
     }
 
     /**
      * 分页获取列表（封装类）
      *
-     * @param chartQueryRequest
+     * @param chatQueryRequest
      * @param request
      * @return
      */
     @PostMapping("/list/page")
-    public BaseResponse<Page<Chart>> listChartByPage(@RequestBody ChartQueryRequest chartQueryRequest,
+    public BaseResponse<Page<History>> listHistoriesByPage(@RequestBody ChatQueryRequest chatQueryRequest,
             HttpServletRequest request) {
-        long current = chartQueryRequest.getCurrent();
-        long size = chartQueryRequest.getPageSize();
+        long current = chatQueryRequest.getCurrent();
+        long size = chatQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<Chart> chartPage = chartService.page(new Page<>(current, size),
-                getQueryWrapper(chartQueryRequest));
+        Page<History> chartPage = historyService.page(new Page<>(current, size),
+                getQueryWrapper(chatQueryRequest));
         return ResultUtils.success(chartPage);
     }
 
     /**
      * 分页获取当前用户创建的资源列表
      *
-     * @param chartQueryRequest
+     * @param chatQueryRequest
      * @param request
      * @return
      */
     @PostMapping("/my/list/page")
-    public BaseResponse<Page<Chart>> listMyChartByPage(@RequestBody ChartQueryRequest chartQueryRequest,
+    public BaseResponse<Page<History>> listMyChartByPage(@RequestBody ChatQueryRequest chatQueryRequest,
             HttpServletRequest request) {
-        if (chartQueryRequest == null) {
+        if (chatQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
-        chartQueryRequest.setUserId(loginUser.getId());
-        long current = chartQueryRequest.getCurrent();
-        long size = chartQueryRequest.getPageSize();
+        chatQueryRequest.setUserId(loginUser.getId());
+        long current = chatQueryRequest.getCurrent();
+        long size = chatQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<Chart> chartPage = chartService.page(new Page<>(current, size),
-                getQueryWrapper(chartQueryRequest));
+        Page<History> chartPage = historyService.page(new Page<>(current, size),
+                getQueryWrapper(chatQueryRequest));
         return ResultUtils.success(chartPage);
     }
 
@@ -214,18 +212,18 @@ public class ChatController {
         if (chartEditRequest == null || chartEditRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Chart chart = new Chart();
+        History chart = new History();
         BeanUtils.copyProperties(chartEditRequest, chart);
         User loginUser = userService.getLoginUser(request);
         long id = chartEditRequest.getId();
         // 判断是否存在
-        Chart oldChart = chartService.getById(id);
-        ThrowUtils.throwIf(oldChart == null, ErrorCode.NOT_FOUND_ERROR);
+        History oldHistory = historyService.getById(id);
+        ThrowUtils.throwIf(oldHistory == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可编辑
-        if (!oldChart.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+        if (!oldHistory.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
-        boolean result = chartService.updateById(chart);
+        boolean result = historyService.updateById(chart);
         return ResultUtils.success(result);
     }
 
@@ -279,92 +277,70 @@ public class ChatController {
     /**
      * 智能分析（异步消息队列）
      *
-     * @param multipartFile
-     * @param genChartByAiRequest
      * @param request
      * @return
      */
     @PostMapping("/gen/async/mq")
-    public BaseResponse<BiResponse> genChatByAiAsyncMq(@RequestPart("file") MultipartFile multipartFile,
-                                                      GenChartByAiRequest genChartByAiRequest, HttpServletRequest request) {
-        String name = genChartByAiRequest.getName();
-        String goal = genChartByAiRequest.getGoal();
-        String chartType = genChartByAiRequest.getChartType();
+    public BaseResponse<History> genChatByAiAsyncMq(@RequestBody ChatAddRequest chatAddRequest, HttpServletRequest request) {
+        String askContent = chatAddRequest.getAskContent();
+        int id = chatAddRequest.getId();
         // 校验
-        ThrowUtils.throwIf(StringUtils.isBlank(goal), ErrorCode.PARAMS_ERROR, "目标为空");
-        ThrowUtils.throwIf(StringUtils.isNotBlank(name) && name.length() > 100, ErrorCode.PARAMS_ERROR, "名称过长");
-        // 校验文件
-        long size = multipartFile.getSize();
-        String originalFilename = multipartFile.getOriginalFilename();
-        // 校验文件大小
-        final long ONE_MB = 1024 * 1024L;
-        ThrowUtils.throwIf(size > ONE_MB, ErrorCode.PARAMS_ERROR, "文件超过 1M");
-        // 校验文件后缀 aaa.png
-        String suffix = FileUtil.getSuffix(originalFilename);
-        final List<String> validFileSuffixList = Arrays.asList("xlsx", "xls");
-        ThrowUtils.throwIf(!validFileSuffixList.contains(suffix), ErrorCode.PARAMS_ERROR, "文件后缀非法");
-        User loginUser = userService.getLoginUser(request);
+        ThrowUtils.throwIf(StringUtils.isBlank(askContent), ErrorCode.PARAMS_ERROR, "询问内容为空");
+        ThrowUtils.throwIf(StringUtils.isNotBlank(askContent) && askContent.length() > 100, ErrorCode.PARAMS_ERROR, "问题过长");
 
+        User loginUser = userService.getLoginUser(request);
         // 限流判断，每个用户一个限流器
         redisLimiterManager.doRateLimit("genChartByAi_" + loginUser.getId());
 
+        long biModelId = new ModelID().getModelID(id);
+
         // 构造用户输入
         StringBuilder userInput = new StringBuilder();
-        userInput.append("分析需求：").append("\n");
+        userInput.append(askContent);
 
-        // 拼接分析目标
-        String userGoal = goal;
-        if (StringUtils.isNotBlank(chartType)) {
-            userGoal += "，请使用" + chartType;
+        History history = new History();
+        history.setAskContent(askContent);
+        history.setUserId(loginUser.getId());
+
+        boolean saveResult = historyService.save(history);
+        if(!saveResult) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "啊哦，数据库开小差了");
         }
-        userInput.append(userGoal).append("\n");
-        userInput.append("原始数据：").append("\n");
-
-        // 压缩后的数据
-        String csvData = ExcelUtils.excelToCsv(multipartFile);
-        userInput.append(csvData).append("\n");
+        //todo:修改为异步操作，优先修改rabbitMQ添加新的消息队列
+        String result = aiManager.doChat(biModelId, userInput.toString());
 
         // 插入到数据库
-        Chart chart = new Chart();
-        chart.setName(name);
-        chart.setGoal(goal);
-        chart.setChartData(csvData);
-        chart.setChartType(chartType);
-        chart.setStatus("wait");
-        chart.setUserId(loginUser.getId());
-        boolean saveResult = chartService.save(chart);
-        ThrowUtils.throwIf(!saveResult, ErrorCode.SYSTEM_ERROR, "图表保存失败");
-        long newChartId = chart.getId();
-        biMessageProducer.sendMessage(String.valueOf(newChartId));
-        BiResponse biResponse = new BiResponse();
-        biResponse.setChartId(newChartId);
-        return ResultUtils.success(biResponse);
+        long updateHistoryId = history.getId();
+        History updateHistory = historyService.getById(updateHistoryId);
+        if(updateHistory == null){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "数据已经被清理了");
+        }
+        updateHistory.setReplyContent(result);
+        boolean updateResult = historyService.updateById(updateHistory);
+        ThrowUtils.throwIf(!updateResult, ErrorCode.SYSTEM_ERROR, "图表更新失败");
+        return ResultUtils.success(updateHistory);
     }
 
     /**
      * 获取查询包装类
      *
-     * @param chartQueryRequest
+     * @param chatQueryRequest
      * @return
      */
-    private QueryWrapper<Chart> getQueryWrapper(ChartQueryRequest chartQueryRequest) {
-        QueryWrapper<Chart> queryWrapper = new QueryWrapper<>();
-        if (chartQueryRequest == null) {
+    private QueryWrapper<History> getQueryWrapper(ChatQueryRequest chatQueryRequest) {
+        QueryWrapper<History> queryWrapper = new QueryWrapper<>();
+        if (chatQueryRequest == null) {
             return queryWrapper;
         }
-        Long id = chartQueryRequest.getId();
-        String name = chartQueryRequest.getName();
-        String goal = chartQueryRequest.getGoal();
-        String chartType = chartQueryRequest.getChartType();
-        Long userId = chartQueryRequest.getUserId();
-        String sortField = chartQueryRequest.getSortField();
-        String sortOrder = chartQueryRequest.getSortOrder();
+        Long id = chatQueryRequest.getId();
+        Long userId = chatQueryRequest.getUserId();
+        int modelId = chatQueryRequest.getModelId();
+        String sortField = chatQueryRequest.getSortField();
+        String sortOrder = chatQueryRequest.getSortOrder();
 
         queryWrapper.eq(id != null && id > 0, "id", id);
-        queryWrapper.like(StringUtils.isNotBlank(name), "name", name);
-        queryWrapper.eq(StringUtils.isNotBlank(goal), "goal", goal);
-        queryWrapper.eq(StringUtils.isNotBlank(chartType), "chartType", chartType);
         queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
+        queryWrapper.eq(ObjectUtils.isNotEmpty(modelId), "modelId", modelId);
         queryWrapper.eq("isDelete", false);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);

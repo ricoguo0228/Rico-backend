@@ -10,10 +10,13 @@
             <result property="replyContent" column="replyContent" jdbcType="VARCHAR"/>
             <result property="userId" column="userId" jdbcType="BIGINT"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="modelId" column="modelId" jdbcType="INTEGER"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,askContent,replyContent,
-        userId,createTime
+        userId,createTime,modelId,
+        isDelete
     </sql>
 </mapper>
