@@ -10,6 +10,7 @@ import com.rico.rbi.common.DeleteRequest;
 import com.rico.rbi.common.ErrorCode;
 import com.rico.rbi.common.ResultUtils;
 import com.rico.rbi.constant.CommonConstant;
+import com.rico.rbi.constant.ModelID;
 import com.rico.rbi.constant.UserConstant;
 import com.rico.rbi.exception.BusinessException;
 import com.rico.rbi.exception.ThrowUtils;
@@ -238,6 +239,7 @@ public class ChatController {
     @PostMapping("/gen")
     public BaseResponse<History> genChartByAi(@RequestBody ChatAddRequest chatAddRequest, HttpServletRequest request) {
         String askContent = chatAddRequest.getAskContent();
+        int id = chatAddRequest.getId();
         // 校验
         ThrowUtils.throwIf(StringUtils.isBlank(askContent), ErrorCode.PARAMS_ERROR, "询问内容为空");
         ThrowUtils.throwIf(StringUtils.isNotBlank(askContent) && askContent.length() > 100, ErrorCode.PARAMS_ERROR, "问题过长");
@@ -246,7 +248,7 @@ public class ChatController {
         // 限流判断，每个用户一个限流器
         redisLimiterManager.doRateLimit("genChartByAi_" + loginUser.getId());
 
-        long biModelId = CommonConstant.BI_MODEL_ID;
+        long biModelId = new ModelID().getModelID(id);
 
         // 构造用户输入
         StringBuilder userInput = new StringBuilder();

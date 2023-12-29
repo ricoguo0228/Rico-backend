@@ -17,9 +17,9 @@ public class ChatAddRequest implements Serializable {
      */
     private String askContent;
     /**
-     *
+     * 模型ID
      */
-    private String modelID;
+    private int id;
 
     private static final long serialVersionUID = 1L;
 }
