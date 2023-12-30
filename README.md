@@ -1,5 +1,5 @@
 # Rico AIGC平台
-前端项目地址：https://github.com/ricoguo0228/ricobi-frontend-master
+前端项目地址：https://github.com/ricoguo0228/Rico-frontend
 
 项目背景：学校工作室项目，从 0 开始自主搭建的 AIGC 平台，该平台开发旨在解决不同专业学生对 AI 的需求，核心业务为 AI Chat 和 数据分析功能，平台将结合 AI 能力为用户回答问题，或提供详尽的数据分析与图表展示。
 
