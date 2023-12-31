@@ -25,7 +25,11 @@ import com.rico.rbi.utils.ExcelUtils;
 import com.rico.rbi.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RKeys;
+import org.redisson.api.RList;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 帖子接口
@@ -65,6 +70,9 @@ public class ChartController {
 
     @Resource
     private BiMessageProducer biMessageProducer;
+
+    @Resource
+    private RedissonClient redissonClient;
 
     // region 增删改查
 
@@ -182,7 +190,7 @@ public class ChartController {
      * @return
      */
     @PostMapping("/my/list/page")
-    public BaseResponse<Page<Chart>> listMyChartByPage(@RequestBody ChartQueryRequest chartQueryRequest,
+    public BaseResponse<List<Chart>> listMyChartByPage(@RequestBody ChartQueryRequest chartQueryRequest,
             HttpServletRequest request) {
         if (chartQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -193,9 +201,15 @@ public class ChartController {
         long size = chartQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<Chart> chartPage = chartService.page(new Page<>(current, size),
-                getQueryWrapper(chartQueryRequest));
-        return ResultUtils.success(chartPage);
+        RList<Chart> list = redissonClient.getList("u_"+loginUser.getId()+"_"+current+"_"+size);
+        if(!list.isExists()){
+            List<Chart> charts= chartService.page(new Page<>(current, size),
+                    getQueryWrapper(chartQueryRequest)).getRecords();
+            list.addAll(charts);
+            list.expire(300, TimeUnit.SECONDS);
+            return ResultUtils.success(charts);
+        }
+        return ResultUtils.success(list.readAll());
     }
 
     // endregion
@@ -304,6 +318,9 @@ public class ChartController {
         updateChart.setStatus("succeed");
         boolean updateResult = chartService.updateById(updateChart);
         ThrowUtils.throwIf(!updateResult, ErrorCode.SYSTEM_ERROR, "图表更新失败");
+        // 删 Redis
+        RKeys keys = redissonClient.getKeys();
+        keys.deleteByPattern("u_"+loginUser.getId()+"*");
         BiResponse biResponse = new BiResponse();
         biResponse.setGenChart(genChart);
         biResponse.setGenResult(genResult);
