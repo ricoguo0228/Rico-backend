@@ -1,20 +1,24 @@
-# RBI AIGC平台
-前端项目地址：https://github.com/ricoguo0228/ricobi-frontend-master
+# Rico AIGC平台
+### 前端项目地址：https://github.com/ricoguo0228/Rico-frontend
+### iOS端项目地址：https://github.com/ricoguo0228/iOS-GPT
 
-项目介绍：从 0 开始自主搭建的数据分析平台，该平台开发旨在解决非专业用户的数据分析问题，用户上传 Excel 表格，平台结合AI能力为用户提供详尽的数据分析与图表展示
+项目背景：学校工作室项目（敏感信息已经清除），从 0 开始自主搭建的 AIGC 平台，该平台开发旨在解决不同专业学生对 AI 的需求，核心业务为 AI Chat 和 数据分析功能，平台将结合 AI 能力为用户回答问题，或提供详尽的数据分析与图表展示。
 
-技术选型：React（使用Ant Design Pro进行快捷开发），SpringBoot，MySQL，MyBatisPlus，Redis，RabbitMQ
 
-主要工作：
+前端技术选型：React（使用Ant Design Pro进行快捷开发），SwiftUI
 
-1.自定义业务异常、通用返回类和返回码，实现了统一的前后端消息交互，方便错误的排查，提高系统可维护性和健壮性。
+后端技术选型：SpringBoot，MySQL，MyBatisPlus，Redis，RabbitMQ
 
-2.使用 Redis 的 List 数据结构将图表代码、AI 回答内容进行缓存，查询时先查缓存，如果命中直接返回，实测响应速度提升了30%。
 
-3.基于 Redisson 的 RateLimiter 实现分布式限流，使用令牌桶算法控制单用户访问的频率，防止某用户恶意占用系统资源。
+### 校园内部测试已于2023年5月正式结束，此开源版本为测试前最后一次调试更改，不包括测试期间的版本更新。
 
-4.使用 Easy Excel 解析用户上传的 XLSX 表格数据文件并压缩为 CSV ，解决了AIGC 输入 Token 长度的限制问题，实测提高了 50% 的单次输入数据量。
 
-5.基于 RabbitMQ 的发布-订阅模式实现了 AI 调用的并发执行和异步化，解决了本地任务队列重启丢失数据的问题。
+核心功能介绍：
 
-6.使用 Knife4j + Swagger 自动生成后端接口文档，并通过编写 ApiOperation 等注解补充接口注释，避免了人工编写维护文档的麻烦。
+1.对模型进行预设实现不同类型的问答，如”金融专家“、”代码大师“、”、“建模专家”等。
+
+2.上传 Excel 文件，实现简单的数学分析与统计，并用图表直观展示。
+
+3.使用自研模型，实现 AI 绘画功能。
+
+3.注册成为 VIP，享受更多问答机会（仅使用第三方 API 作为模型时有效，资金由第三方 API 收取）。
