@@ -1,17 +1,17 @@
 # Rico AIGC平台
 
 ## 前端项目地址：https://github.com/ricoguo0228/Rico-frontend
-
 ## iOS端项目地址：https://github.com/ricoguo0228/iOS-GPT
 
 项目背景：学校工作室项目（敏感信息已经清除），从 0 开始自主搭建的 AIGC 平台，该平台开发旨在解决不同专业学生对 AI 的需求，核心业务为 AI Chat 和 数据分析功能，平台将结合 AI 能力为用户回答问题，或提供详尽的数据分析与图表展示。
 
 
 前端技术选型：React（使用Ant Design Pro进行快捷开发），SwiftUI
+
 后端技术选型：SpringBoot，MySQL，MyBatisPlus，Redis，RabbitMQ
 
 
-校园内部测试已于2023年5月正式结束，此开源版本为测试前最后一次调试更改，不包括测试期间的版本更新。
+### 校园内部测试已于2023年5月正式结束，此开源版本为测试前最后一次调试更改，不包括测试期间的版本更新。
 
 
 核心功能介绍：
