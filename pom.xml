@@ -10,9 +10,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.rico</groupId>
-    <artifactId>rbi-backend</artifactId>
+    <artifactId>Rico-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>rbi-backend</name>
+    <name>Rico-backend</name>
     <properties>
         <java.version>1.8</java.version>
     </properties>
