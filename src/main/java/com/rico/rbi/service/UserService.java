@@ -36,6 +36,8 @@ public interface UserService extends IService<User> {
      */
     LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request);
 
+    LoginUserVO wechatuserLogin(String code, HttpServletRequest request) throws Exception;
+
     /**
      * 获取当前登录用户
      *
@@ -107,4 +109,5 @@ public interface UserService extends IService<User> {
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 
+    String getOpenid(String code)throws Exception;
 }

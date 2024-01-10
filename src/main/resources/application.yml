@@ -14,7 +14,7 @@ spring:
     # store-type: redis
     # 30 天过期
     timeout: 2592000
-    store-type: redis
+    store-type: None
   # 数据库配置
   # todo 需替换配置
   datasource:

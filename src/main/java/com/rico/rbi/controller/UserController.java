@@ -9,11 +9,7 @@ import com.rico.rbi.common.ResultUtils;
 import com.rico.rbi.constant.UserConstant;
 import com.rico.rbi.exception.BusinessException;
 import com.rico.rbi.exception.ThrowUtils;
-import com.rico.rbi.model.dto.user.UserAddRequest;
-import com.rico.rbi.model.dto.user.UserLoginRequest;
-import com.rico.rbi.model.dto.user.UserQueryRequest;
-import com.rico.rbi.model.dto.user.UserRegisterRequest;
-import com.rico.rbi.model.dto.user.UserUpdateRequest;
+import com.rico.rbi.model.dto.user.*;
 import com.rico.rbi.model.entity.User;
 import com.rico.rbi.model.vo.LoginUserVO;
 import com.rico.rbi.model.vo.UserVO;
@@ -34,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 用户接口
  *
- 
+
  */
 @RestController
 @RequestMapping("/user")
@@ -69,6 +65,26 @@ public class UserController {
     }
 
     /**
+     * 微信用户登录
+     *
+     * @param userLoginRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/wechat_login")
+    public BaseResponse<LoginUserVO> userWechatLogin(@RequestBody UserWXRequest userLoginRequest, HttpServletRequest request) throws Exception {
+        if (userLoginRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String code = userLoginRequest.getCode();
+        if (StringUtils.isAnyBlank(code)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
+        LoginUserVO loginUserVO=userService.wechatuserLogin(code,request);
+        return ResultUtils.success(loginUserVO);
+    }
+    /**
      * 用户登录
      *
      * @param userLoginRequest
@@ -88,7 +104,6 @@ public class UserController {
         LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
         return ResultUtils.success(loginUserVO);
     }
-
     /**
      * 用户注销
      *
@@ -200,7 +215,7 @@ public class UserController {
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<User>> listUserByPage(@RequestBody UserQueryRequest userQueryRequest,
-            HttpServletRequest request) {
+                                                   HttpServletRequest request) {
         long current = userQueryRequest.getCurrent();
         long size = userQueryRequest.getPageSize();
         Page<User> userPage = userService.page(new Page<>(current, size),
@@ -217,7 +232,7 @@ public class UserController {
      */
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest,
-            HttpServletRequest request) {
+                                                       HttpServletRequest request) {
         if (userQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
