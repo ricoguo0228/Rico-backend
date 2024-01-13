@@ -71,7 +71,7 @@ public class UserController {
      * @param request
      * @return
      */
-    @PostMapping("/wechat_login")
+    @PostMapping("/wechatLogin")
     public BaseResponse<LoginUserVO> userWechatLogin(@RequestBody UserWXRequest userLoginRequest, HttpServletRequest request) throws Exception {
         if (userLoginRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

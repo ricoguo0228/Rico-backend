@@ -327,6 +327,91 @@ public class ChartController {
         biResponse.setChartId(updateChart.getId());
         return ResultUtils.success(biResponse);
     }
+    /**
+     * 微信智能分析（同步）
+     *
+     * @param multipartFile
+     * @param genChartByAiRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/wxGen")
+    public BaseResponse<BiResponse> wxGenChartByAi(@RequestPart("file") MultipartFile multipartFile,
+                                                   WxGenChartByAiRequest genChartByAiRequest, HttpServletRequest request) {
+        String name = genChartByAiRequest.getName();
+        String goal = genChartByAiRequest.getGoal();
+        String chartType = genChartByAiRequest.getChartType();
+        long id = genChartByAiRequest.getId();
+        // 校验
+        ThrowUtils.throwIf(StringUtils.isBlank(goal), ErrorCode.PARAMS_ERROR, "目标为空");
+        ThrowUtils.throwIf(StringUtils.isNotBlank(name) && name.length() > 100, ErrorCode.PARAMS_ERROR, "名称过长");
+        // 校验文件
+        long size = multipartFile.getSize();
+        String originalFilename = multipartFile.getOriginalFilename();
+        // 校验文件大小
+        final long ONE_MB = 1024 * 1024L;
+        ThrowUtils.throwIf(size > ONE_MB, ErrorCode.PARAMS_ERROR, "文件超过 1M");
+        // 校验文件后缀 aaa.png
+        String suffix = FileUtil.getSuffix(originalFilename);
+        final List<String> validFileSuffixList = Arrays.asList("xlsx");
+        ThrowUtils.throwIf(!validFileSuffixList.contains(suffix), ErrorCode.PARAMS_ERROR, "文件后缀非法");
+        // 限流判断，每个用户一个限流器
+        redisLimiterManager.doRateLimit("genChartByAi_" + id);
+
+        long biModelId = CommonConstant.BI_MODEL_ID;
+
+        // 构造用户输入
+        StringBuilder userInput = new StringBuilder();
+        userInput.append("分析需求：").append("\n");
+
+        // 拼接分析目标
+        String userGoal = goal;
+        if (StringUtils.isNotBlank(chartType)) {
+            userGoal += "，请使用" + chartType;
+        }
+        userInput.append(userGoal).append("\n");
+        userInput.append("原始数据：").append("\n");
+        // 压缩后的数据
+        String csvData = ExcelUtils.excelToCsv(multipartFile);
+        userInput.append(csvData).append("\n");
+        Chart chart = new Chart();
+        chart.setName(name);
+        chart.setGoal(goal);
+        chart.setChartData(csvData);
+        chart.setChartType(chartType);
+        chart.setStatus("running");
+        chart.setUserId(id);
+        boolean saveResult = chartService.save(chart);
+        if(!saveResult){
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "啊哦，数据库开小差了");
+        }
+        String result = aiManager.doChat(biModelId, userInput.toString());
+        String[] splits = result.split("【【【【【");
+        if (splits.length < 3) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "AI 生成错误");
+        }
+        String genChart = splits[1].trim();
+        String genResult = splits[2].trim();
+        // 插入到数据库
+        long updateChartId = chart.getId();
+        Chart updateChart = chartService.getById(updateChartId);
+        if(updateChart == null){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "数据已经被清理了");
+        }
+        updateChart.setGenChart(genChart);
+        updateChart.setGenResult(genResult);
+        updateChart.setStatus("succeed");
+        boolean updateResult = chartService.updateById(updateChart);
+        ThrowUtils.throwIf(!updateResult, ErrorCode.SYSTEM_ERROR, "图表更新失败");
+        // 删 Redis
+        RKeys keys = redissonClient.getKeys();
+        keys.deleteByPattern("u_"+id+"*");
+        BiResponse biResponse = new BiResponse();
+        biResponse.setGenChart(genChart);
+        biResponse.setGenResult(genResult);
+        biResponse.setChartId(updateChart.getId());
+        return ResultUtils.success(biResponse);
+    }
 
     /**
      * 智能分析（异步消息队列）
