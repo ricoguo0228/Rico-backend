@@ -233,7 +233,7 @@ public class ChatController {
     @PostMapping("/gen")
     public BaseResponse<History> genChartByAi(@RequestBody ChatAddRequest chatAddRequest, HttpServletRequest request) {
         String askContent = chatAddRequest.getAskContent();
-        int id = chatAddRequest.getId();
+        String id = chatAddRequest.getId();
         // 校验
         ThrowUtils.throwIf(StringUtils.isBlank(askContent), ErrorCode.PARAMS_ERROR, "询问内容为空");
         ThrowUtils.throwIf(StringUtils.isNotBlank(askContent) && askContent.length() > 100, ErrorCode.PARAMS_ERROR, "问题过长");
@@ -279,7 +279,7 @@ public class ChatController {
     @PostMapping("/gen/async/mq")
     public BaseResponse<History> genChatByAiAsyncMq(@RequestBody ChatAddRequest chatAddRequest, HttpServletRequest request) {
         String askContent = chatAddRequest.getAskContent();
-        int id = chatAddRequest.getId();
+        String id = chatAddRequest.getId();
         // 校验
         ThrowUtils.throwIf(StringUtils.isBlank(askContent), ErrorCode.PARAMS_ERROR, "询问内容为空");
         ThrowUtils.throwIf(StringUtils.isNotBlank(askContent) && askContent.length() > 100, ErrorCode.PARAMS_ERROR, "问题过长");

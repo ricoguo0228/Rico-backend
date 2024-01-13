@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class ModelID {
     private final Map<String,Long> idMap = new HashMap<>();
-   public  long getModelID(int id) {
+   public  long getModelID(String id) {
         return this.idMap.getOrDefault(id, -1L);
     }
     public ModelID() {
