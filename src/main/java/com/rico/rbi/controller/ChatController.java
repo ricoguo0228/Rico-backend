@@ -18,6 +18,7 @@ import com.rico.rbi.manager.RedisLimiterManager;
 import com.rico.rbi.model.dto.chart.*;
 import com.rico.rbi.model.dto.chat.ChatAddRequest;
 import com.rico.rbi.model.dto.chat.ChatQueryRequest;
+import com.rico.rbi.model.dto.chat.WxChatAddRequest;
 import com.rico.rbi.model.entity.History;
 import com.rico.rbi.model.entity.History;
 import com.rico.rbi.model.entity.User;
@@ -251,6 +252,52 @@ public class ChatController {
         History history = new History();
         history.setAskContent(askContent);
         history.setUserId(loginUser.getId());
+
+        boolean saveResult = historyService.save(history);
+        if(!saveResult){
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "啊哦，数据库开小差了");
+        }
+        String result = aiManager.doChat(biModelId, userInput.toString());
+
+        // 插入到数据库
+        long updateHistoryId = history.getId();
+        History updateHistory = historyService.getById(updateHistoryId);
+        if(updateHistory == null){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "数据已经被清理了");
+        }
+        updateHistory.setReplyContent(result);
+        boolean updateResult = historyService.updateById(updateHistory);
+        ThrowUtils.throwIf(!updateResult, ErrorCode.SYSTEM_ERROR, "图表更新失败");
+        return ResultUtils.success(updateHistory);
+    }
+    /**
+     * 微信智能分析（同步）
+     *
+     * @param chatAddRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/wxGen")
+    public BaseResponse<History> wxGenChartByAi(@RequestBody WxChatAddRequest chatAddRequest, HttpServletRequest request) {
+        String askContent = chatAddRequest.getAskContent();
+        String id = chatAddRequest.getId();
+        long userId = chatAddRequest.getUserId();
+        // 校验
+        ThrowUtils.throwIf(StringUtils.isBlank(askContent), ErrorCode.PARAMS_ERROR, "询问内容为空");
+        ThrowUtils.throwIf(StringUtils.isNotBlank(askContent) && askContent.length() > 1000, ErrorCode.PARAMS_ERROR, "问题过长");
+        // 限流判断，每个用户一个限流器
+        redisLimiterManager.doRateLimit("genChartByAi_" + userId);
+
+        long biModelId = new ModelID().getModelID(id);
+
+        // 构造用户输入
+        StringBuilder userInput = new StringBuilder();
+        userInput.append(askContent);
+
+        History history = new History();
+        history.setAskContent(askContent);
+        history.setUserId(userId);
+        history.setModelId(biModelId);
 
         boolean saveResult = historyService.save(history);
         if(!saveResult){

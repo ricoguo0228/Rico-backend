@@ -44,7 +44,7 @@ public class History implements Serializable {
     /**
      * 
      */
-    private Integer modelId;
+    private long modelId;
 
     /**
      * 
