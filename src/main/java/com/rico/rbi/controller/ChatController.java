@@ -225,14 +225,14 @@ public class ChatController {
     }
 
     /**
-     * 智能分析（同步）
+     * AI问答（同步）
      *
      * @param chatAddRequest
      * @param request
      * @return
      */
     @PostMapping("/gen")
-    public BaseResponse<History> genChartByAi(@RequestBody ChatAddRequest chatAddRequest, HttpServletRequest request) {
+    public BaseResponse<History> ChatWithAi(@RequestBody ChatAddRequest chatAddRequest, HttpServletRequest request) {
         String askContent = chatAddRequest.getAskContent();
         String id = chatAddRequest.getId();
         // 校验
@@ -271,14 +271,14 @@ public class ChatController {
         return ResultUtils.success(updateHistory);
     }
     /**
-     * 微信智能分析（同步）
+     * 微信AI问答（同步）
      *
      * @param chatAddRequest
      * @param request
      * @return
      */
     @PostMapping("/wxGen")
-    public BaseResponse<History> wxGenChartByAi(@RequestBody WxChatAddRequest chatAddRequest, HttpServletRequest request) {
+    public BaseResponse<History> wxChatWithAi(@RequestBody WxChatAddRequest chatAddRequest, HttpServletRequest request) {
         String askContent = chatAddRequest.getAskContent();
         String id = chatAddRequest.getId();
         long userId = chatAddRequest.getUserId();
@@ -318,13 +318,13 @@ public class ChatController {
     }
 
     /**
-     * 智能分析（异步消息队列）
+     * AI问答（异步消息队列）
      *
      * @param request
      * @return
      */
     @PostMapping("/gen/async/mq")
-    public BaseResponse<History> genChatByAiAsyncMq(@RequestBody ChatAddRequest chatAddRequest, HttpServletRequest request) {
+    public BaseResponse<History> ChatWithAiAsyncMq(@RequestBody ChatAddRequest chatAddRequest, HttpServletRequest request) {
         String askContent = chatAddRequest.getAskContent();
         String id = chatAddRequest.getId();
         // 校验
