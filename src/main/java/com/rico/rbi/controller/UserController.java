@@ -64,26 +64,6 @@ public class UserController {
     }
 
     /**
-     * 微信用户登录
-     *
-     * @param userLoginRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/wechatLogin")
-    public BaseResponse<LoginUserVO> userWechatLogin(@RequestBody UserWXRequest userLoginRequest, HttpServletRequest request) throws Exception {
-        if (userLoginRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        String code = userLoginRequest.getCode();
-        if (StringUtils.isAnyBlank(code)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        //LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
-        LoginUserVO loginUserVO=userService.wechatuserLogin(code,request);
-        return ResultUtils.success(loginUserVO);
-    }
-    /**
      * 用户登录
      *
      * @param userLoginRequest

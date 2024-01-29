@@ -115,24 +115,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         request.getSession().setAttribute(USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
     }
-    @Override
-    public LoginUserVO wechatuserLogin(String code, HttpServletRequest request) throws Exception {
-        String openid=getOpenid(code);
-        if(openid == null){
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"微信未授权");
-        }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("wxOpenID", openid);
-        User user = this.baseMapper.selectOne(queryWrapper);
-        if(user == null){
-            User newUser = new User();
-            newUser.setWxOpenID(openid);
-            this.save(newUser);
-            user = this.getById(newUser);
-        }
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
-        return getLoginUserVO(user);
-    }
 
     /**
      * 获取当前登录用户
