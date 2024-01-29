@@ -36,7 +36,7 @@ create table User
         primary key,
     userAccount  varchar(64)                           null,
     userPassword varchar(256)                          null,
-    userName     varchar(64) default 'GPT新用户'       null,
+    userName     varchar(64) default 'GPTNewUser'       null,
     userAvatar   varchar(256)                          null,
     userRole     varchar(64)                           null,
     createTime   timestamp   default CURRENT_TIMESTAMP not null,
