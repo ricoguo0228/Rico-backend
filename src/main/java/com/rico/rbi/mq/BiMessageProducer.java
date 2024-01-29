@@ -1,4 +1,4 @@
-package com.rico.rbi.bizmq;
+package com.rico.rbi.mq;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;

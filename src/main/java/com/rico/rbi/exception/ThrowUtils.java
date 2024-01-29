@@ -5,7 +5,6 @@ import com.rico.rbi.common.ErrorCode;
 /**
  * 抛异常工具类
  *
- 
  */
 public class ThrowUtils {
 

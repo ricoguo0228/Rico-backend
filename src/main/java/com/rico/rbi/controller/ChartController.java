@@ -4,7 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rico.rbi.annotation.AuthCheck;
-import com.rico.rbi.bizmq.BiMessageProducer;
+import com.rico.rbi.mq.BiMessageProducer;
 import com.rico.rbi.common.BaseResponse;
 import com.rico.rbi.common.DeleteRequest;
 import com.rico.rbi.common.ErrorCode;
@@ -25,13 +25,11 @@ import com.rico.rbi.utils.ExcelUtils;
 import com.rico.rbi.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RKeys;
 import org.redisson.api.RList;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,14 +37,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 帖子接口
+ * 图表分析功能接口
  *
- 
  */
 @RestController
 @RequestMapping("/chart")

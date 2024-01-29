@@ -3,10 +3,8 @@ package com.rico.rbi.common;
 /**
  * 自定义错误码
  *
- 
  */
 public enum ErrorCode {
-
     SUCCESS(20000, "ok"),
     PARAMS_ERROR(40000, "请求参数错误"),
     NOT_LOGIN_ERROR(40100, "未登录"),

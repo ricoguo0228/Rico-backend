@@ -1,4 +1,4 @@
-package com.rico.rbi.bizmq;
+package com.rico.rbi.mq;
 
 public interface BiMqConstant {
 

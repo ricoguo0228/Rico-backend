@@ -3,7 +3,6 @@ package com.rico.rbi.constant;
 /**
  * 用户常量
  *
- 
  */
 public interface UserConstant {
 

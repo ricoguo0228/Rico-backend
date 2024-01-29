@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
- * 专门提供 RedisLimiter 限流基础服务的（提供了通用的能力）
+ * 专门提供 RedisLimiter 限流基础服务的
  */
 @Service
 public class RedisLimiterManager {

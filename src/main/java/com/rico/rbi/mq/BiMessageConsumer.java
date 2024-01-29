@@ -1,4 +1,4 @@
-package com.rico.rbi.bizmq;
+package com.rico.rbi.mq;
 
 import com.rabbitmq.client.Channel;
 import com.rico.rbi.common.ErrorCode;

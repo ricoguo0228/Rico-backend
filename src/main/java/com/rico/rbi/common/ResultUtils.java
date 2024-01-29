@@ -6,7 +6,6 @@ package com.rico.rbi.common;
  
  */
 public class ResultUtils {
-
     /**
      * 成功
      *

@@ -16,7 +16,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 /**
  * 请求响应日志 AOP
  *
- 
  **/
 @Aspect
 @Component
@@ -24,7 +23,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class LogInterceptor {
 
     /**
-     * 执行拦截
+     * 执行拦截，记录日志和响应时间
      */
     @Around("execution(* com.rico.rbi.controller.*.*(..))")
     public Object doInterceptor(ProceedingJoinPoint point) throws Throwable {

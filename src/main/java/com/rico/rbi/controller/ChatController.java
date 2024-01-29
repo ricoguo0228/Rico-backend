@@ -3,7 +3,7 @@ package com.rico.rbi.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rico.rbi.annotation.AuthCheck;
-import com.rico.rbi.bizmq.BiMessageProducer;
+import com.rico.rbi.mq.BiMessageProducer;
 import com.rico.rbi.common.BaseResponse;
 import com.rico.rbi.common.DeleteRequest;
 import com.rico.rbi.common.ErrorCode;
@@ -20,20 +20,15 @@ import com.rico.rbi.model.dto.chat.ChatAddRequest;
 import com.rico.rbi.model.dto.chat.ChatQueryRequest;
 import com.rico.rbi.model.dto.chat.WxChatAddRequest;
 import com.rico.rbi.model.entity.History;
-import com.rico.rbi.model.entity.History;
 import com.rico.rbi.model.entity.User;
-import com.rico.rbi.model.vo.BiResponse;
-import com.rico.rbi.service.ChartService;
 import com.rico.rbi.service.HistoryService;
 import com.rico.rbi.service.UserService;
-import com.rico.rbi.utils.ExcelUtils;
 import com.rico.rbi.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * 聊天接口
  *
- 
  */
 @RestController
 @RequestMapping("/chat")
