@@ -14,6 +14,8 @@ import com.rico.rbi.mapper.ChartMapper;
 import com.rico.rbi.service.UserService;
 import com.rico.rbi.utils.ExcelUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RKeys;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +34,8 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart>
 
     @Resource
     private UserService userService;
+    @Resource
+    private RedissonClient redissonClient;
 
     @Resource
     private BiMessageProducer biMessageProducer;
@@ -89,6 +93,9 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart>
         chart.setUserId(loginUser.getId());
         int saveResult = chartMapper.insert(chart);
         ThrowUtils.throwIf(saveResult == 0, ErrorCode.SYSTEM_ERROR, "图表保存失败");
+        // 删 Redis
+        RKeys keys = redissonClient.getKeys();
+        keys.deleteByPattern("u_"+loginUser.getId()+"*");
         long newChartId = chart.getId();
         biMessageProducer.sendMessage(String.valueOf(newChartId));
         BiResponse biResponse = new BiResponse();

@@ -38,7 +38,7 @@ spring:
     host: localhost
     port: 5672
     password: 20030228
-    username: root
+    username: rico
     virtual-host: /rico_v
 server:
   address: 0.0.0.0
@@ -60,5 +60,5 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值（默认为 0）
 yuapi:
   client:
-    access-key: anop4jq8k64y7yoaw27bfz045nhpr0pd
-    secret-key: ty8qw8pp9tahjku1pc3llme44hewo5xn
+    access-key: r5z3tv679m29nz1jx2gebmbwv1xmppf7
+    secret-key: 07fjjcr4rdnluj5rzzjvuq8gd1zfmvy9

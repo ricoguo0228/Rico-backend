@@ -101,8 +101,12 @@ public class ChartController {
         }
         User user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
-        return ResultUtils.success(chartService.deleteChart(id, user));
-
+        boolean res = chartService.deleteChart(id, user);
+        if(res){
+            RKeys keys = redissonClient.getKeys();
+            keys.deleteByPattern("u_"+user.getId()+"*");
+        }
+        return ResultUtils.success(res);
     }
 
     /**
@@ -364,10 +368,10 @@ public class ChartController {
         String sortOrder = chartQueryRequest.getSortOrder();
 
         queryWrapper.eq(id != null && id > 0, "id", id);
-        queryWrapper.like(StringUtils.isNotBlank(name), "name", name);
-        queryWrapper.eq(StringUtils.isNotBlank(goal), "goal", goal);
-        queryWrapper.eq(StringUtils.isNotBlank(chartType), "chartType", chartType);
-        queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
+        queryWrapper.like(name !=null, "name", name);
+        queryWrapper.eq(goal!=null, "goal", goal);
+        queryWrapper.eq(chartType!=null, "chartType", chartType);
+        queryWrapper.eq(userId!=null, "userId", userId);
         queryWrapper.eq("isDelete", false);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);

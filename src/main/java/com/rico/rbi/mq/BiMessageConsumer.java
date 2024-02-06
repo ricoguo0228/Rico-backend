@@ -10,6 +10,8 @@ import com.rico.rbi.service.ChartService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RKeys;
+import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -23,7 +25,8 @@ public class BiMessageConsumer {
 
     @Resource
     private ChartService chartService;
-
+    @Resource
+    private RedissonClient redissonClient;
     @Resource
     private AiManager aiManager;
 
@@ -74,12 +77,16 @@ public class BiMessageConsumer {
             channel.basicNack(deliveryTag, false, false);
             handleChartUpdateError(chart.getId(), "更新图表成功状态失败");
         }
+        // 删 Redis
+        RKeys keys = redissonClient.getKeys();
+        keys.deleteByPattern("u_" + chart.getUserId() + "*");
         // 消息确认
         channel.basicAck(deliveryTag, false);
     }
 
     /**
      * 构建用户输入
+     *
      * @param chart
      * @return
      */
